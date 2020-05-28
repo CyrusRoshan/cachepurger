@@ -1,0 +1,17 @@
+name: 'Cachebuster'
+description: 'Purge files that have changed from your website's cloudflare cache'
+inputs:
+  url-prefix:
+    description: 'URL that hosts published files'
+    required: true
+    default: 'https://cyrusroshan.com/'
+  api-token:
+    description: 'Scoped API Token allowed to access the "cache_purge" role'
+    required: true
+    default: 'YQSn-xWAQiiEh9qM58wZNnyQS7FUdoqGIUAbrh7T'
+outputs:
+  purged_file_count:
+    description: 'Number of purged files'
+runs:
+  using: 'node12'
+  main: 'index.js'
