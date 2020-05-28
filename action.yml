@@ -1,5 +1,5 @@
 name: 'Cachebuster'
-description: 'Purge files that have changed from your website's cloudflare cache'
+description: 'Purge files that have changed from your website''s cloudflare cache'
 inputs:
   url-prefix:
     description: 'URL that hosts published files'
@@ -14,4 +14,4 @@ outputs:
     description: 'Number of purged files'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
