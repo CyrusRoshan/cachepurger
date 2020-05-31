@@ -9,9 +9,10 @@ inputs:
     description: 'Scoped API Token allowed to access the "cache_purge" role'
     required: true
     default: 'YQSn-xWAQiiEh9qM58wZNnyQS7FUdoqGIUAbrh7T'
-outputs:
-  purged_file_count:
-    description: 'Number of purged files'
+  from-commit:
+    default: ${{ github.event.before }}
+  to-commit:
+    default: ${{ github.sha }}
 runs:
   using: 'node12'
   main: 'dist/index.js'

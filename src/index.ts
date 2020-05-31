@@ -1,19 +1,17 @@
-import { getInput, setOutput, setFailed } from '@actions/core';
+import { getInput } from '@actions/core';
 import { exec } from 'child_process';
 
 try {
-  console.log('START');
-
   (async () => {
     const urlPrefix = getInput('url-prefix');
     const apiToken = getInput('api-token');
+    const fromCommit = getInput('from-commit') || 'HEAD~1';
+    const toCommit = getInput('to-commit') || 'HEAD';
     const gitPath = process.env.GITHUB_WORKSPACE || '.';
-    console.log('A')
 
     const diffFiles: String[] = await new Promise((resolve, reject) => {
-      exec(`git diff --name-only HEAD~1`, { cwd: gitPath },
+      exec(`git diff --name-only ${fromCommit} ${toCommit}`, { cwd: gitPath },
         (error, stdout, stderr) => {
-          console.log('B')
           if (error) {
             reject('exec error:' + error.message)
           }
@@ -21,17 +19,34 @@ try {
             reject('error running git diff: ' + stderr);
           }
 
-          console.log('C')
           const diffFiles = stdout.split('\n').filter((x) => x.length)
           resolve(diffFiles);
         }
       );
     })
-    console.log('D')
 
-    setOutput("purged_file_count", diffFiles.length);
+    console.log("Changed files:", diffFiles);
+
+    // split files into groups of 30,
+    // make post request
+    const chunks = chunk(diffFiles, 30);
+    chunks.forEach((chunk) => {
+      // fetch(chunk)
+      console.log('chunk:', chunk);
+    })
   })()
-  console.log('E')
 } catch (error) {
-  setFailed(error.message);
+  console.error(error.message);
+}
+
+function chunk<T>(arr: T[], max: number): T[][] {
+  var chunks = [];
+  while (arr.length > max) {
+    chunks = [...chunks, arr.slice(0, max)];
+    arr = arr.slice(max);
+  }
+  if (arr.length != 0) {
+    chunks = [...chunks, arr];
+  }
+  return chunks;
 }

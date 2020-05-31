@@ -433,7 +433,7 @@ function getState(name) {
 }
 exports.getState = getState;
 //# sourceMappingURL=core.js.map
-},{"./command":"opPA"}],"index.ts":[function(require,module,exports) {
+},{"./command":"opPA"}],"QCba":[function(require,module,exports) {
 "use strict";
 
 var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
@@ -577,6 +577,14 @@ var __generator = this && this.__generator || function (thisArg, body) {
   }
 };
 
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) r[k] = a[j];
+
+  return r;
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -586,26 +594,23 @@ var core_1 = require("@actions/core");
 var child_process_1 = require("child_process");
 
 try {
-  console.log('START');
-
   (function () {
     return __awaiter(void 0, void 0, void 0, function () {
-      var urlPrefix, apiToken, gitPath, diffFiles;
+      var urlPrefix, apiToken, fromCommit, toCommit, gitPath, diffFiles, chunks;
       return __generator(this, function (_a) {
         switch (_a.label) {
           case 0:
             urlPrefix = core_1.getInput('url-prefix');
             apiToken = core_1.getInput('api-token');
+            fromCommit = core_1.getInput('from-commit') || 'HEAD~1';
+            toCommit = core_1.getInput('to-commit') || 'HEAD';
             gitPath = process.env.GITHUB_WORKSPACE || '.';
-            console.log('A');
             return [4
             /*yield*/
             , new Promise(function (resolve, reject) {
-              child_process_1.exec("git diff --name-only HEAD~1", {
+              child_process_1.exec("git diff --name-only " + fromCommit + " " + toCommit, {
                 cwd: gitPath
               }, function (error, stdout, stderr) {
-                console.log('B');
-
                 if (error) {
                   reject('exec error:' + error.message);
                 }
@@ -614,7 +619,6 @@ try {
                   reject('error running git diff: ' + stderr);
                 }
 
-                console.log('C');
                 var diffFiles = stdout.split('\n').filter(function (x) {
                   return x.length;
                 });
@@ -624,8 +628,12 @@ try {
 
           case 1:
             diffFiles = _a.sent();
-            console.log('D');
-            core_1.setOutput("purged_file_count", diffFiles.length);
+            console.log("Changed files:", diffFiles);
+            chunks = chunk(diffFiles, 30);
+            chunks.forEach(function (chunk) {
+              // fetch(chunk)
+              console.log('chunk:', chunk);
+            });
             return [2
             /*return*/
             ];
@@ -633,9 +641,22 @@ try {
       });
     });
   })();
-
-  console.log('E');
 } catch (error) {
-  core_1.setFailed(error.message);
+  console.error(error.message);
 }
-},{"@actions/core":"RNev"}]},{},["index.ts"], null)
+
+function chunk(arr, max) {
+  var chunks = [];
+
+  while (arr.length > max) {
+    chunks = __spreadArrays(chunks, [arr.slice(0, max)]);
+    arr = arr.slice(max);
+  }
+
+  if (arr.length != 0) {
+    chunks = __spreadArrays(chunks, [arr]);
+  }
+
+  return chunks;
+}
+},{"@actions/core":"RNev"}]},{},["QCba"], null)
