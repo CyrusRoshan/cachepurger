@@ -1,10 +1,24 @@
-import { getInput, setOutput, setFailed } from '@actions/core'
+import { getInput, setOutput, setFailed } from '@actions/core';
+import { exec } from 'child_process';
 
 try {
   const urlPrefix = getInput('url-prefix');
   const apiToken = getInput('api-token');
+  const gitPath = process.env.GITHUB_WORKSPACE;
 
-  setOutput("purged_file_count", 0);
+  exec(`cd ${gitPath} && git diff --name-only HEAD~1`,
+    (error, stdout, stderr) => {
+      if (error) {
+        throw('exec error:' + error.message)
+      }
+      if (stderr) {
+        throw('error running git diff: ' + stderr);
+      }
+
+      const diffFiles = stdout.split('\n').filter((x) => x.length)
+      setOutput("purged_file_count", diffFiles.length);
+    }
+  );
 } catch (error) {
   setFailed(error.message);
 }
