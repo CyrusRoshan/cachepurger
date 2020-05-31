@@ -4,9 +4,12 @@ import { exec } from 'child_process';
 try {
   const urlPrefix = getInput('url-prefix');
   const apiToken = getInput('api-token');
-  const gitPath = process.env.GITHUB_WORKSPACE;
+  const gitPath = process.env.GITHUB_WORKSPACE || '.';
 
-  exec(`cd ${gitPath} && git diff --name-only HEAD~1`,
+  exec(`git diff --name-only HEAD~1`,
+    {
+      cwd: gitPath,
+    },
     (error, stdout, stderr) => {
       if (error) {
         throw('exec error:' + error.message)
