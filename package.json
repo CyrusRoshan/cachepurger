@@ -8,12 +8,14 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "watch": "parcel watch ./src/index.ts -d dist --no-source-maps --target node --bundle-node-modules --no-hmr",
-    "build": "parcel build ./src/index.ts -d dist --no-source-maps --target node --bundle-node-modules --no-minify"
+    "watch": "parcel watch ./src/index.ts --no-source-maps --no-hmr",
+    "build": "parcel build ./src/index.ts --no-source-maps --no-minify"
   },
   "dependencies": {
     "@actions/core": "^1.2.4",
-    "@actions/github": "^2.2.0",
-    "parcel": "^1.12.4"
+    "@actions/github": "^2.2.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0-alpha.3.2"
   }
 }
