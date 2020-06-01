@@ -5,8 +5,16 @@ import { fetch } from 'cross-fetch';
 (async () => {
   try {
     const urlPrefix = getInput('url-prefix', { required: true });
-    const apiToken = getInput('api-token', { required: true });
     const zoneID = getInput('zone-id', { required: true });
+
+    const apiToken = getInput('api-token');
+    const apiKey = getInput('api-key');
+    const email = getInput('email');
+
+    if (!apiToken && (!apiKey || !email)) {
+      throw('either the API Token or API Key and Email are required for auth')
+    }
+
     const fromCommit = getInput('from-commit') || 'HEAD~1';
     const toCommit = getInput('to-commit') || 'HEAD';
     const gitPath = process.env.GITHUB_WORKSPACE || '.';
@@ -33,10 +41,15 @@ import { fetch } from 'cross-fetch';
     const requests = chunks.map((chunk) => {
       return fetch(`https://api.cloudflare.com/client/v4/zones/${zoneID}/purge_cache`, {
         method: 'POST',
-        headers: {
+        headers: Object.assign({
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiToken}`
-        },
+        }, (apiToken ?
+          { 'Authorization': `Bearer ${apiToken}` } :
+          {
+            'X-Auth-Key': apiKey,
+            'X-Auth-Email': email,
+          })
+        ),
         redirect: 'follow',
         body: JSON.stringify(chunk.map(url => urlPrefix + url)),
       })

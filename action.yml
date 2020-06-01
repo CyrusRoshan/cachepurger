@@ -4,15 +4,15 @@ inputs:
   url-prefix:
     description: 'URL that hosts published files'
     required: true
-    default: 'https://cyrusroshan.com/'
   zone-id:
     description: 'Cloudflare Zone ID'
     required: true
-    default: '023e105f4ecef8ad9ca31a8372d0c353'
   api-token:
-    description: 'Scoped Cloudflare API Token allowed to access the "cache_purge" role'
-    required: true
-    default: 'YQSn-xWAQiiEh9qM58wZNnyQS7FUdoqGIUAbrh7T'
+    description: 'Scoped Cloudflare API Token. Either use this, or API Key + Email'
+  api-key:
+    description: 'Cloudflare Global API Key'
+  email:
+    description: 'Cloudflare Email'
   from-commit:
     default: ${{ github.event.before }}
   to-commit:

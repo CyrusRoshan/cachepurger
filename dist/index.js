@@ -2347,7 +2347,7 @@ var cross_fetch_1 = require("cross-fetch");
 
 (function () {
   return __awaiter(void 0, void 0, void 0, function () {
-    var urlPrefix_1, apiToken_1, zoneID_1, fromCommit_1, toCommit_1, gitPath_1, diffFiles, chunks, requests, i, resp, _a, error_1;
+    var urlPrefix_1, zoneID_1, apiToken_1, apiKey_1, email_1, fromCommit_1, toCommit_1, gitPath_1, diffFiles, chunks, requests, i, resp, _a, error_1;
 
     return __generator(this, function (_b) {
       switch (_b.label) {
@@ -2357,12 +2357,17 @@ var cross_fetch_1 = require("cross-fetch");
           urlPrefix_1 = core_1.getInput('url-prefix', {
             required: true
           });
-          apiToken_1 = core_1.getInput('api-token', {
-            required: true
-          });
           zoneID_1 = core_1.getInput('zone-id', {
             required: true
           });
+          apiToken_1 = core_1.getInput('api-token');
+          apiKey_1 = core_1.getInput('api-key');
+          email_1 = core_1.getInput('email');
+
+          if (!apiToken_1 && (!apiKey_1 || !email_1)) {
+            throw 'either the API Token or API Key and Email are required for auth';
+          }
+
           fromCommit_1 = core_1.getInput('from-commit') || 'HEAD~1';
           toCommit_1 = core_1.getInput('to-commit') || 'HEAD';
           gitPath_1 = process.env.GITHUB_WORKSPACE || '.';
@@ -2394,10 +2399,14 @@ var cross_fetch_1 = require("cross-fetch");
           requests = chunks.map(function (chunk) {
             return cross_fetch_1.fetch("https://api.cloudflare.com/client/v4/zones/" + zoneID_1 + "/purge_cache", {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
+              headers: Object.assign({
+                'Content-Type': 'application/json'
+              }, apiToken_1 ? {
                 'Authorization': "Bearer " + apiToken_1
-              },
+              } : {
+                'X-Auth-Key': apiKey_1,
+                'X-Auth-Email': email_1
+              }),
               redirect: 'follow',
               body: JSON.stringify(chunk.map(function (url) {
                 return urlPrefix_1 + url;
