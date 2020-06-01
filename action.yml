@@ -1,4 +1,7 @@
-name: 'Cachebuster'
+name: 'cf-cachebuster'
+branding:
+  icon: 'cloud-lightning'
+  color: 'orange'
 description: 'Purge files that have changed from your website''s cloudflare cache'
 inputs:
   url-prefix:

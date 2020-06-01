@@ -35,9 +35,12 @@ import { fetch } from 'cross-fetch';
       );
     })
 
-    console.log("Changed files:", diffFiles);
+    const fileURLs: string[] = diffFiles.map(filePath => {
+      return (urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + filePath;
+    })
+    console.log("Changed files:", JSON.stringify(fileURLs, null, 2));
 
-    const chunks = chunk(diffFiles, 30);
+    const chunks = chunk(fileURLs, 30);
     const requests = chunks.map((chunk) => {
       return fetch(`https://api.cloudflare.com/client/v4/zones/${zoneID}/purge_cache`, {
         method: 'POST',
@@ -51,7 +54,7 @@ import { fetch } from 'cross-fetch';
           })
         ),
         redirect: 'follow',
-        body: JSON.stringify({'files': chunk.map(url => urlPrefix + url)}),
+        body: JSON.stringify({'files': chunk}),
       })
     })
     for (let i = 0; i < requests.length; i++) {

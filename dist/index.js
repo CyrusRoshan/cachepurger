@@ -2347,7 +2347,7 @@ var cross_fetch_1 = require("cross-fetch");
 
 (function () {
   return __awaiter(void 0, void 0, void 0, function () {
-    var urlPrefix_1, zoneID_1, apiToken_1, apiKey_1, email_1, fromCommit_1, toCommit_1, gitPath_1, diffFiles, chunks, requests, i, resp, _a, error_1;
+    var urlPrefix_1, zoneID_1, apiToken_1, apiKey_1, email_1, fromCommit_1, toCommit_1, gitPath_1, diffFiles, fileURLs, chunks, requests, i, resp, _a, error_1;
 
     return __generator(this, function (_b) {
       switch (_b.label) {
@@ -2394,8 +2394,11 @@ var cross_fetch_1 = require("cross-fetch");
 
         case 1:
           diffFiles = _b.sent();
-          console.log("Changed files:", diffFiles);
-          chunks = chunk(diffFiles, 30);
+          fileURLs = diffFiles.map(function (filePath) {
+            return (urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + filePath;
+          });
+          console.log("Changed files:", JSON.stringify(fileURLs, null, 2));
+          chunks = chunk(fileURLs, 30);
           requests = chunks.map(function (chunk) {
             return cross_fetch_1.fetch("https://api.cloudflare.com/client/v4/zones/" + zoneID_1 + "/purge_cache", {
               method: 'POST',
@@ -2409,9 +2412,7 @@ var cross_fetch_1 = require("cross-fetch");
               }),
               redirect: 'follow',
               body: JSON.stringify({
-                'files': chunk.map(function (url) {
-                  return urlPrefix_1 + url;
-                })
+                'files': chunk
               })
             });
           });
