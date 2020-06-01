@@ -48,7 +48,8 @@ try {
     }
   })()
 } catch (error) {
-  console.error(error.message);
+  console.error(error);
+  process.exit(1);
 }
 
 function chunk<T>(arr: T[], max: number): T[][] {
