@@ -1,8 +1,9 @@
 import { getInput } from '@actions/core';
 import { exec } from 'child_process';
+import { fetch } from 'cross-fetch';
 
-try {
-  (async () => {
+(async () => {
+  try {
     const urlPrefix = getInput('url-prefix', { required: true });
     const apiToken = getInput('api-token', { required: true });
     const zoneID = getInput('zone-id', { required: true });
@@ -43,14 +44,14 @@ try {
     for (let i = 0; i < requests.length; i++) {
       const resp = await requests[i];
       if (resp.status !== 200) {
-        throw(`CF response code ${resp.status}, body: ${resp.text()}`)
+        throw(`CF response code ${resp.status}, body: ${await resp.text()}`)
       }
     }
-  })()
-} catch (error) {
-  console.error(error);
-  process.exit(1);
-}
+  } catch (error) {
+    console.error('Error: ', error);
+    process.exit(1);
+  }
+})()
 
 function chunk<T>(arr: T[], max: number): T[][] {
   var chunks = [];

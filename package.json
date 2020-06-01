@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.4",
-    "@actions/github": "^2.2.0"
+    "@actions/github": "^2.2.0",
+    "cross-fetch": "^3.0.4"
   },
   "devDependencies": {
     "parcel": "^1.12.4"
