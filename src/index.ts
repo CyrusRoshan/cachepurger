@@ -51,7 +51,7 @@ import { fetch } from 'cross-fetch';
           })
         ),
         redirect: 'follow',
-        body: JSON.stringify({files: chunk.map(url => urlPrefix + url)}),
+        body: JSON.stringify({'files': chunk.map(url => urlPrefix + url)}),
       })
     })
     for (let i = 0; i < requests.length; i++) {
