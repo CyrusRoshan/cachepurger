@@ -2408,9 +2408,11 @@ var cross_fetch_1 = require("cross-fetch");
                 'X-Auth-Email': email_1
               }),
               redirect: 'follow',
-              body: JSON.stringify(chunk.map(function (url) {
-                return urlPrefix_1 + url;
-              }))
+              body: JSON.stringify({
+                files: chunk.map(function (url) {
+                  return urlPrefix_1 + url;
+                })
+              })
             });
           });
           i = 0;
