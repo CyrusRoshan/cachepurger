@@ -3,8 +3,9 @@ import { exec } from 'child_process';
 
 try {
   (async () => {
-    const urlPrefix = getInput('url-prefix');
-    const apiToken = getInput('api-token');
+    const urlPrefix = getInput('url-prefix', { required: true });
+    const apiToken = getInput('api-token', { required: true });
+    const zoneID = getInput('zone-id', { required: true });
     const fromCommit = getInput('from-commit') || 'HEAD~1';
     const toCommit = getInput('to-commit') || 'HEAD';
     const gitPath = process.env.GITHUB_WORKSPACE || '.';
@@ -27,13 +28,24 @@ try {
 
     console.log("Changed files:", diffFiles);
 
-    // split files into groups of 30,
-    // make post request
     const chunks = chunk(diffFiles, 30);
-    chunks.forEach((chunk) => {
-      // fetch(chunk)
-      console.log('chunk:', chunk);
+    const requests = chunks.map((chunk) => {
+      return fetch(`https://api.cloudflare.com/client/v4/zones/${zoneID}/purge_cache`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiToken}`
+        },
+        redirect: 'follow',
+        body: JSON.stringify(chunk.map(url => urlPrefix + url)),
+      })
     })
+    for (let i = 0; i < requests.length; i++) {
+      const resp = await requests[i];
+      if (resp.status !== 200) {
+        throw(`CF response code ${resp.status}, body: ${resp.text()}`)
+      }
+    }
   })()
 } catch (error) {
   console.error(error.message);

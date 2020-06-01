@@ -596,12 +596,19 @@ var child_process_1 = require("child_process");
 try {
   (function () {
     return __awaiter(void 0, void 0, void 0, function () {
-      var urlPrefix, apiToken, fromCommit, toCommit, gitPath, diffFiles, chunks;
+      var urlPrefix, apiToken, zoneID, fromCommit, toCommit, gitPath, diffFiles, chunks, requests, i, resp;
       return __generator(this, function (_a) {
         switch (_a.label) {
           case 0:
-            urlPrefix = core_1.getInput('url-prefix');
-            apiToken = core_1.getInput('api-token');
+            urlPrefix = core_1.getInput('url-prefix', {
+              required: true
+            });
+            apiToken = core_1.getInput('api-token', {
+              required: true
+            });
+            zoneID = core_1.getInput('zone-id', {
+              required: true
+            });
             fromCommit = core_1.getInput('from-commit') || 'HEAD~1';
             toCommit = core_1.getInput('to-commit') || 'HEAD';
             gitPath = process.env.GITHUB_WORKSPACE || '.';
@@ -630,10 +637,46 @@ try {
             diffFiles = _a.sent();
             console.log("Changed files:", diffFiles);
             chunks = chunk(diffFiles, 30);
-            chunks.forEach(function (chunk) {
-              // fetch(chunk)
-              console.log('chunk:', chunk);
+            requests = chunks.map(function (chunk) {
+              return fetch("https://api.cloudflare.com/client/v4/zones/" + zoneID + "/purge_cache", {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': "Bearer " + apiToken
+                },
+                redirect: 'follow',
+                body: JSON.stringify(chunk.map(function (url) {
+                  return urlPrefix + url;
+                }))
+              });
             });
+            i = 0;
+            _a.label = 2;
+
+          case 2:
+            if (!(i < requests.length)) return [3
+            /*break*/
+            , 5];
+            return [4
+            /*yield*/
+            , requests[i]];
+
+          case 3:
+            resp = _a.sent();
+
+            if (resp.status !== 200) {
+              throw "CF response code " + resp.status + ", body: " + resp.text();
+            }
+
+            _a.label = 4;
+
+          case 4:
+            i++;
+            return [3
+            /*break*/
+            , 2];
+
+          case 5:
             return [2
             /*return*/
             ];
