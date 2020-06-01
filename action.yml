@@ -1,4 +1,4 @@
-name: 'cf-cachebuster'
+name: 'cachepurger'
 branding:
   icon: 'cloud-lightning'
   color: 'orange'
