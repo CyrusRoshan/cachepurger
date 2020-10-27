@@ -2345,9 +2345,11 @@ var child_process_1 = require("child_process");
 
 var cross_fetch_1 = require("cross-fetch");
 
+var path_1 = require("path");
+
 (function () {
   return __awaiter(void 0, void 0, void 0, function () {
-    var urlPrefix_1, zoneID_1, apiToken_1, apiKey_1, email_1, fromCommit_1, toCommit_1, gitPath_1, diffFiles, fileURLs, chunks, requests, i, resp, _a, error_1;
+    var urlPrefix_1, zoneID_1, apiToken_1, apiKey_1, email_1, fromCommit_1, toCommit_1, gitPath_1, diffFiles, fileURLs_1, chunks, requests, i, resp, _a, error_1;
 
     return __generator(this, function (_b) {
       switch (_b.label) {
@@ -2394,11 +2396,18 @@ var cross_fetch_1 = require("cross-fetch");
 
         case 1:
           diffFiles = _b.sent();
-          fileURLs = diffFiles.map(function (filePath) {
+          fileURLs_1 = diffFiles.map(function (filePath) {
             return (urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + filePath;
+          }); // index.html
+
+          diffFiles.map(function (filePath) {
+            if (path_1.basename(filePath, path_1.extname(filePath)) == 'index') {
+              fileURLs_1.push((urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + path_1.dirname(filePath));
+              fileURLs_1.push((urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + path_1.dirname(filePath) + '/');
+            }
           });
-          console.log("Changed files:", JSON.stringify(fileURLs, null, 2));
-          chunks = chunk(fileURLs, 30);
+          console.log("Changed files:", JSON.stringify(fileURLs_1, null, 2));
+          chunks = chunk(fileURLs_1, 30);
           requests = chunks.map(function (chunk) {
             return cross_fetch_1.fetch("https://api.cloudflare.com/client/v4/zones/" + zoneID_1 + "/purge_cache", {
               method: 'POST',
