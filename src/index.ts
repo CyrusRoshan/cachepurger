@@ -42,8 +42,12 @@ import { basename, dirname, extname } from 'path';
     // index.html
     diffFiles.map(filePath => {
       if (basename(filePath, extname(filePath)) == 'index') {
-        fileURLs.push((urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + dirname(filePath));
-        fileURLs.push((urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + dirname(filePath) + '/');
+        var fileDir = dirname(filePath);
+        if(fileDir == "."){
+          fileDir = "";
+        }
+        fileURLs.push((urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + fileDir);
+        fileURLs.push((urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + fileDir + '/');
       }
     })
     console.log("Changed files:", JSON.stringify(fileURLs, null, 2));

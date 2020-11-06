@@ -2402,8 +2402,14 @@ var path_1 = require("path");
 
           diffFiles.map(function (filePath) {
             if (path_1.basename(filePath, path_1.extname(filePath)) == 'index') {
-              fileURLs_1.push((urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + path_1.dirname(filePath));
-              fileURLs_1.push((urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + path_1.dirname(filePath) + '/');
+              var fileDir = path_1.dirname(filePath);
+
+              if (fileDir == ".") {
+                fileDir = "";
+              }
+
+              fileURLs_1.push((urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + fileDir);
+              fileURLs_1.push((urlPrefix_1.endsWith('/') ? urlPrefix_1 : urlPrefix_1 + '/') + fileDir + '/');
             }
           });
           console.log("Changed files:", JSON.stringify(fileURLs_1, null, 2));
