@@ -1,6 +1,7 @@
 import { getInput } from '@actions/core';
 import { exec } from 'child_process';
 import { fetch } from 'cross-fetch';
+import { basename, dirname, extname } from 'path';
 
 (async () => {
   try {
@@ -37,6 +38,17 @@ import { fetch } from 'cross-fetch';
 
     const fileURLs: string[] = diffFiles.map(filePath => {
       return (urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + filePath;
+    })
+    // index.html
+    diffFiles.map(filePath => {
+      if (basename(filePath, extname(filePath)) == 'index') {
+        var fileDir = dirname(filePath);
+        if(fileDir == "."){
+          fileDir = "";
+        }
+        fileURLs.push((urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + fileDir);
+        fileURLs.push((urlPrefix.endsWith('/') ? urlPrefix : urlPrefix + '/') + fileDir + '/');
+      }
     })
     console.log("Changed files:", JSON.stringify(fileURLs, null, 2));
 
