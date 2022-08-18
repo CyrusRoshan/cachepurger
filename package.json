@@ -12,7 +12,7 @@
     "build": "parcel build ./src/index.ts -d dist --no-source-maps --target node --bundle-node-modules --no-minify"
   },
   "dependencies": {
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.9.1",
     "@actions/github": "^2.2.0",
     "cross-fetch": "^3.0.4"
   },
